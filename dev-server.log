@@ -1,0 +1,35 @@
+
+> agenttrust@0.1.0 dev
+> next dev --hostname 127.0.0.1
+
+   ▲ Next.js 15.5.16
+   - Local:        http://127.0.0.1:3000
+   - Network:      http://127.0.0.1:3000
+
+ ✓ Starting...
+ ✓ Ready in 4.1s
+ ○ Compiling / ...
+ ✓ Compiled / in 7.1s (584 modules)
+ GET / 200 in 7902ms
+ GET / 200 in 910ms
+ ○ Compiling /favicon.ico ...
+ ✓ Compiled /favicon.ico in 2.8s (351 modules)
+ GET /favicon.ico 200 in 4368ms
+ ✓ Compiled in 1127ms (232 modules)
+ ✓ Compiled in 270ms (232 modules)
+   Reload env: .env.local
+ ✓ Compiled in 756ms (552 modules)
+   Reload env: .env.local
+ ✓ Compiled in 6.9s (584 modules)
+   Reload env: .env.local
+ ✓ Compiled in 425ms (552 modules)
+   Reload env: .env.local
+ ✓ Compiled in 294ms (552 modules)
+   Reload env: .env.local
+ ✓ Compiled in 141ms (552 modules)
+ ✓ Compiled in 422ms (232 modules)
+ ✓ Compiled in 259ms (232 modules)
+ ✓ Compiled in 1307ms (566 modules)
+ ✓ Compiled in 278ms (232 modules)
+ ✓ Compiled in 230ms (232 modules)
+ ✓ Compiled in 198ms (232 modules)
