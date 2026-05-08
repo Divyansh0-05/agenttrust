@@ -9,6 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import type { Product } from "@/lib/types";
 
@@ -35,7 +36,7 @@ export default async function ProductsPage() {
     redirect("/login");
   }
 
-  const { data: products, error } = await supabase
+  const { data: products, error } = await supabaseAdmin
     .from("products")
     .select(
       "id, name, logo_url, category, avg_rating, review_count, trust_score, created_at",

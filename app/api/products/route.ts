@@ -2,7 +2,12 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 import { PLANS, getUserPlan } from "@/lib/plan-limits";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+
+const LOGO_BUCKET = "product-logos";
+const MAX_LOGO_SIZE = 2 * 1024 * 1024;
+const LOGO_TYPES = ["image/jpeg", "image/png", "image/webp", "image/svg+xml"];
 
 const productSchema = z.object({
   name: z.string().trim().min(2, "Name must be at least 2 characters."),
@@ -27,13 +32,13 @@ function slugify(value: string) {
   );
 }
 
-async function getUniqueSlug(supabase: Awaited<ReturnType<typeof createClient>>, name: string) {
+async function getUniqueSlug(name: string) {
   const baseSlug = slugify(name);
   let slug = baseSlug;
   let suffix = 2;
 
   while (true) {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from("products")
       .select("id")
       .eq("slug", slug)
@@ -50,6 +55,59 @@ async function getUniqueSlug(supabase: Awaited<ReturnType<typeof createClient>>,
     slug = `${baseSlug}-${suffix}`;
     suffix += 1;
   }
+}
+
+function fileExtension(file: File) {
+  const nameExtension = file.name.split(".").pop()?.toLowerCase();
+
+  if (nameExtension) {
+    return nameExtension.replace(/[^a-z0-9]/g, "");
+  }
+
+  return file.type.split("/").pop()?.replace("svg+xml", "svg") ?? "png";
+}
+
+async function uploadLogo(userId: string, productSlug: string, logo: File) {
+  if (logo.size === 0) {
+    return null;
+  }
+
+  if (logo.size > MAX_LOGO_SIZE) {
+    throw new Error("Logo must be 2MB or smaller.");
+  }
+
+  if (!LOGO_TYPES.includes(logo.type)) {
+    throw new Error("Logo must be a JPG, PNG, WebP, or SVG image.");
+  }
+
+  const { error: bucketError } = await supabaseAdmin.storage.createBucket(LOGO_BUCKET, {
+    public: true,
+    fileSizeLimit: MAX_LOGO_SIZE,
+    allowedMimeTypes: LOGO_TYPES,
+  });
+
+  if (
+    bucketError &&
+    !bucketError.message.toLowerCase().includes("already exists")
+  ) {
+    throw new Error(`Unable to prepare logo storage: ${bucketError.message}`);
+  }
+
+  const path = `${userId}/${productSlug}.${fileExtension(logo)}`;
+  const { error } = await supabaseAdmin.storage
+    .from(LOGO_BUCKET)
+    .upload(path, logo, {
+      contentType: logo.type,
+      upsert: true,
+    });
+
+  if (error) {
+    throw new Error(`Unable to upload logo: ${error.message}`);
+  }
+
+  const { data } = supabaseAdmin.storage.from(LOGO_BUCKET).getPublicUrl(path);
+
+  return data.publicUrl;
 }
 
 export async function POST(request: Request) {
@@ -73,12 +131,16 @@ export async function POST(request: Request) {
 
   if (!parsed.success) {
     return NextResponse.json(
-      { error: "Invalid product details.", issues: parsed.error.flatten() },
+      {
+        error:
+          parsed.error.issues[0]?.message ?? "Invalid product details.",
+        issues: parsed.error.flatten(),
+      },
       { status: 400 },
     );
   }
 
-  const { data: profile, error: profileError } = await supabase
+  const { data: profile, error: profileError } = await supabaseAdmin
     .from("profiles")
     .select("plan")
     .eq("id", user.id)
@@ -88,26 +150,54 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: profileError.message }, { status: 500 });
   }
 
-  const plan = getUserPlan(profile);
-  const { count, error: countError } = await supabase
+  let userPlan = getUserPlan(profile);
+
+  if (!profile) {
+    const { error: insertProfileError } = await supabaseAdmin
+      .from("profiles")
+      .insert({
+        id: user.id,
+        full_name: user.user_metadata.full_name ?? null,
+        avatar_url: user.user_metadata.avatar_url ?? null,
+        plan: "free",
+      });
+
+    if (insertProfileError) {
+      return NextResponse.json(
+        { error: `Unable to create profile: ${insertProfileError.message}` },
+        { status: 500 },
+      );
+    }
+
+    userPlan = "free";
+  }
+
+  const { count, error: countError } = await supabaseAdmin
     .from("products")
     .select("id", { count: "exact", head: true })
     .eq("owner_id", user.id);
 
   if (countError) {
-    return NextResponse.json({ error: countError.message }, { status: 500 });
+    return NextResponse.json(
+      { error: `Unable to check product limit: ${countError.message}` },
+      { status: 500 },
+    );
   }
 
-  if ((count ?? 0) >= PLANS[plan].products) {
+  if ((count ?? 0) >= PLANS[userPlan].products) {
     return NextResponse.json(
-      { error: `Your ${plan} plan allows ${PLANS[plan].products} product.` },
+      {
+        error: `Your ${userPlan} plan allows ${PLANS[userPlan].products} product.`,
+      },
       { status: 403 },
     );
   }
 
   try {
-    const slug = await getUniqueSlug(supabase, parsed.data.name);
-    const { data: product, error } = await supabase
+    const slug = await getUniqueSlug(parsed.data.name);
+    const logo = formData.get("logo");
+    const logoUrl = logo instanceof File ? await uploadLogo(user.id, slug, logo) : null;
+    const { data: product, error } = await supabaseAdmin
       .from("products")
       .insert({
         owner_id: user.id,
@@ -117,7 +207,7 @@ export async function POST(request: Request) {
         category: parsed.data.category,
         tagline: parsed.data.tagline || null,
         description: parsed.data.description || null,
-        logo_url: null,
+        logo_url: logoUrl,
       })
       .select("id")
       .single();
