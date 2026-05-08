@@ -19,6 +19,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { calculateTrustScore, getTrustGrade } from "@/lib/trust-score";
 import type {
   Product,
   RevenueConnection,
@@ -45,7 +46,6 @@ type PublicProduct = Pick<
   | "website_url"
   | "logo_url"
   | "category"
-  | "trust_score"
   | "avg_rating"
   | "review_count"
   | "github_verified"
@@ -76,13 +76,7 @@ type PublicReview = Pick<
   | "created_at"
 >;
 
-function trustGrade(score: number) {
-  if (score >= 85) return "A";
-  if (score >= 70) return "B";
-  if (score >= 55) return "C";
-  if (score >= 40) return "D";
-  return "F";
-}
+type ScoreReview = Pick<Review, "rating" | "is_approved" | "created_at">;
 
 function formatMoney(cents: number | null, currency = "usd") {
   return new Intl.NumberFormat("en-US", {
@@ -155,7 +149,6 @@ async function getProduct(slug: string) {
         "website_url",
         "logo_url",
         "category",
-        "trust_score",
         "avg_rating",
         "review_count",
         "github_verified",
@@ -227,6 +220,7 @@ export default async function ProductProfilePage({
     activeConnectionsResult,
     snapshotsResult,
     reviewsResult,
+    scoreReviewsResult,
     distributionResults,
   ] = await Promise.all([
     showRevenue
@@ -254,6 +248,11 @@ export default async function ProductProfilePage({
       .eq("is_approved", true)
       .order("submitted_at", { ascending: false })
       .range(reviewRangeStart, reviewRangeEnd),
+    supabaseAdmin
+      .from("reviews")
+      .select("rating, is_approved, created_at")
+      .eq("product_id", product.id)
+      .eq("is_approved", true),
     Promise.all(
       [5, 4, 3, 2, 1].map((rating) =>
         supabaseAdmin
@@ -278,6 +277,10 @@ export default async function ProductProfilePage({
     throw new Error(reviewsResult.error.message);
   }
 
+  if (scoreReviewsResult.error) {
+    throw new Error(scoreReviewsResult.error.message);
+  }
+
   const distributionErrors = distributionResults
     .map((result) => result.error)
     .filter(Boolean);
@@ -286,8 +289,9 @@ export default async function ProductProfilePage({
     throw new Error(distributionErrors[0].message);
   }
 
-  const score = Math.round(product.trust_score ?? 0);
-  const grade = trustGrade(score);
+  const scoreReviews = (scoreReviewsResult.data ?? []) as ScoreReview[];
+  const score = calculateTrustScore(product, scoreReviews);
+  const grade = getTrustGrade(score);
   const activeConnections =
     (activeConnectionsResult.data ?? []) as Pick<
       RevenueConnection,
