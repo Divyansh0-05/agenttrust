@@ -12,3 +12,7 @@
  ○ Compiling /p/[slug] ...
  ✓ Compiled /p/[slug] in 9.1s (1734 modules)
  GET /p/clovix 200 in 22219ms
+ ✓ Compiled in 4.8s (741 modules)
+ ✓ Compiled in 470ms (741 modules)
+ ✓ Compiled in 612ms (741 modules)
+ ✓ Compiled in 486ms (727 modules)
