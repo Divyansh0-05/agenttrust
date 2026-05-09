@@ -9,7 +9,7 @@ create table public.profiles (
   full_name text,
   avatar_url text,
   plan text default 'free',
-  stripe_customer_id text,
+  dodo_customer_id text,
   created_at timestamptz default now()
 );
 alter table public.profiles enable row level security;
@@ -197,14 +197,15 @@ create index on public.campaign_recipients(token);
 create index on public.campaign_recipients(campaign_id);
 
 -- ============================================================
--- SUBSCRIPTIONS (synced from Stripe webhooks)
+-- SUBSCRIPTIONS (synced from Dodo webhooks)
 -- ============================================================
 create table public.subscriptions (
   id text primary key,
   user_id uuid references public.profiles(id) on delete cascade not null,
   status text not null,
   plan text not null default 'free',
-  stripe_price_id text,
+  dodo_product_id text,
+  dodo_subscription_id text,
   current_period_end timestamptz,
   cancel_at_period_end boolean default false,
   created_at timestamptz default now(),
@@ -221,7 +222,7 @@ create table public.ad_slots (
   advertiser_url text not null,
   logo_url text,
   tagline text,
-  stripe_subscription_id text,
+  dodo_subscription_id text,
   monthly_price integer,
   is_active boolean default true,
   starts_at timestamptz,

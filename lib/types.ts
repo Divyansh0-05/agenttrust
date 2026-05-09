@@ -3,7 +3,7 @@ export interface Profile {
   full_name: string | null;
   avatar_url: string | null;
   plan: string | null;
-  stripe_customer_id: string | null;
+  dodo_customer_id: string | null;
   created_at: Date | null;
 }
 
@@ -124,7 +124,8 @@ export interface Subscription {
   user_id: string;
   status: string;
   plan: string;
-  stripe_price_id: string | null;
+  dodo_product_id: string | null;
+  dodo_subscription_id: string | null;
   current_period_end: Date | null;
   cancel_at_period_end: boolean | null;
   created_at: Date | null;
@@ -138,7 +139,7 @@ export interface AdSlot {
   advertiser_url: string;
   logo_url: string | null;
   tagline: string | null;
-  stripe_subscription_id: string | null;
+  dodo_subscription_id: string | null;
   monthly_price: number | null;
   is_active: boolean | null;
   starts_at: Date | null;
