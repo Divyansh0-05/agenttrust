@@ -4,12 +4,11 @@ import { redirect } from "next/navigation";
 import { Menu } from "lucide-react";
 
 import { createClient } from "@/lib/supabase/server";
+import DashboardSidebar from "@/components/dashboard/sidebar";
 
 const DASHBOARD_NAV = [
   { href: "/dashboard", label: "Overview" },
   { href: "/dashboard/products", label: "Products" },
-  { href: "/dashboard/reviews", label: "Reviews" },
-  { href: "/dashboard/campaigns", label: "Campaigns" },
   { href: "/dashboard/billing", label: "Billing" },
 ];
 
@@ -98,45 +97,7 @@ export default async function DashboardLayout({
           </div>
         </div>
       </details>
-      <aside className="hidden w-64 shrink-0 border-r bg-background md:flex md:flex-col">
-        <div className="border-b px-5 py-4">
-          <h1 className="text-lg font-semibold">AgentTrust</h1>
-          <p className="text-xs text-muted-foreground">Dashboard</p>
-        </div>
-        <nav className="flex-1 space-y-1 p-3">
-          {DASHBOARD_NAV.map((item) => (
-            <Link
-              key={`${item.label}-${item.href}`}
-              href={item.href}
-              className="block rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-        <div className="border-t p-4">
-          <div className="flex items-center gap-3 rounded-md bg-muted/60 p-3">
-            {profile?.avatar_url ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={profile.avatar_url}
-                alt=""
-                className="size-9 rounded-full border object-cover"
-              />
-            ) : (
-              <div className="flex size-9 items-center justify-center rounded-full border bg-background text-xs font-medium">
-                {initials || "U"}
-              </div>
-            )}
-            <div className="min-w-0">
-              <p className="truncate text-sm font-medium">{displayName}</p>
-              <p className="truncate text-xs text-muted-foreground">
-                {user.email}
-              </p>
-            </div>
-          </div>
-        </div>
-      </aside>
+      <DashboardSidebar nav={DASHBOARD_NAV} user={user} profile={profile} />
       <div className="flex min-w-0 flex-1 flex-col pt-14 md:pt-0">{children}</div>
       <Script id="mobile-dashboard-nav-close" strategy="afterInteractive">
         {`(() => {

@@ -27,8 +27,8 @@ function Navbar() {
           <Link href="/leaderboard" className="hover:text-gray-900 transition-colors">
             Leaderboard
           </Link>
-          <Link href="/for-ai" className="hover:text-gray-900 transition-colors">
-            For AI
+          <Link href="/trust-api" className="hover:text-gray-900 transition-colors">
+            Trust API
           </Link>
         </nav>
 
@@ -390,8 +390,8 @@ function Footer() {
           <Link href="/leaderboard" className="hover:text-gray-800 transition-colors">
             Leaderboard
           </Link>
-          <Link href="/for-ai" className="hover:text-gray-800 transition-colors">
-            For AI
+          <Link href="/trust-api" className="hover:text-gray-800 transition-colors">
+            Trust API
           </Link>
           <Link href="#pricing" className="hover:text-gray-800 transition-colors">
             Pricing
