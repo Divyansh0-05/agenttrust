@@ -345,7 +345,7 @@ export default function TrustApiPage() {
             <div className="space-y-4">
               <p className="text-sm uppercase tracking-[0.24em] text-slate-400">For developers</p>
               <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-                Query any product's trust data
+                Query any product&apos;s trust data
               </h2>
               <p className="text-base leading-7 text-slate-300">
                 No authentication. No signup. Just a GET request.
