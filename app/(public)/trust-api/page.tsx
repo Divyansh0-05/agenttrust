@@ -194,19 +194,29 @@ export default function TrustApiPage() {
             LLM-powered apps can query in real time — before recommending or purchasing on behalf
             of a user.
           </p>
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <Link
-              href="/signup"
-              className="inline-flex w-full items-center justify-center rounded-full bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-700 sm:w-auto"
-            >
-              Add your product free →
-            </Link>
-            <Link
-              href="/leaderboard"
-              className="inline-flex w-full items-center justify-center rounded-full border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-900 shadow-sm transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800 sm:w-auto"
-            >
-              View leaderboard
-            </Link>
+          <div className="flex flex-col gap-4 sm:flex-row sm:gap-4">
+            <div className="flex flex-col items-center sm:items-start">
+              <Link
+                href="/signup"
+                className="inline-flex w-full items-center justify-center rounded-full bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-700 sm:w-auto"
+              >
+                List your product free →
+              </Link>
+              <p className="mt-2 text-xs text-slate-600 dark:text-slate-400">
+                For founders — get discovered by AI agents
+              </p>
+            </div>
+            <div className="flex flex-col items-center sm:items-start">
+              <Link
+                href="#api-docs"
+                className="inline-flex w-full items-center justify-center rounded-full border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-900 shadow-sm transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800 sm:w-auto"
+              >
+                View the API →
+              </Link>
+              <p className="mt-2 text-xs text-slate-600 dark:text-slate-400">
+                For developers — no signup needed
+              </p>
+            </div>
           </div>
         </section>
 
@@ -236,7 +246,7 @@ export default function TrustApiPage() {
           </div>
         </section>
 
-        <section className="mt-20 space-y-6">
+        <section id="api-docs" className="mt-20 space-y-6">
           <SectionHeading>{"Query any product's trust profile"}</SectionHeading>
           <SectionSubhead>One GET request. No API key. Structured JSON.</SectionSubhead>
           <div className="space-y-4">
@@ -316,21 +326,38 @@ export default function TrustApiPage() {
         </section>
 
         <section className="mt-20 rounded-3xl bg-slate-950 px-6 py-12 text-white">
-          <div className="max-w-3xl space-y-4">
-            <p className="text-sm uppercase tracking-[0.24em] text-slate-400">Add your product to AgentTrust</p>
-            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-              Add your product to AgentTrust
-            </h2>
-            <p className="text-base leading-7 text-slate-300">
-              Free forever. Your trust profile goes live in 60 seconds. AI agents start discovering your
-              product immediately.
-            </p>
-            <Link
-              href="/signup"
-              className="inline-flex rounded-full bg-indigo-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 transition-colors hover:bg-indigo-400"
-            >
-              Get started free →
-            </Link>
+          <div className="grid gap-8 sm:grid-cols-2">
+            <div className="space-y-4">
+              <p className="text-sm uppercase tracking-[0.24em] text-slate-400">For founders</p>
+              <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+                Get your product discovered by AI agents
+              </h2>
+              <p className="text-base leading-7 text-slate-300">
+                Free forever. Live profile in 60 seconds.
+              </p>
+              <Link
+                href="/signup"
+                className="inline-flex rounded-full bg-indigo-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 transition-colors hover:bg-indigo-400"
+              >
+                Add your product free →
+              </Link>
+            </div>
+            <div className="space-y-4">
+              <p className="text-sm uppercase tracking-[0.24em] text-slate-400">For developers</p>
+              <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+                Query any product's trust data
+              </h2>
+              <p className="text-base leading-7 text-slate-300">
+                No authentication. No signup. Just a GET request.
+              </p>
+              <CodeBlock>GET https://agenttrust.com/api/trust/[slug]</CodeBlock>
+              <Link
+                href="#api-docs"
+                className="inline-flex rounded-full border border-slate-700 bg-slate-900 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-slate-700/20 transition-colors hover:bg-slate-800"
+              >
+                View API docs →
+              </Link>
+            </div>
           </div>
         </section>
       </main>
