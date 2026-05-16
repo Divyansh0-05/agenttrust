@@ -4,8 +4,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 
-import { createClient as createBrowserSupabaseClient } from "@/lib/supabase/client";
-
 // ─────────────────────────────────────────────
 // Shared nav (mirrors landing page navbar)
 // ─────────────────────────────────────────────
@@ -91,14 +89,6 @@ interface LeaderboardResponse {
   page: number;
   pageSize: number;
   totalPages: number;
-}
-
-interface LeaderboardAdSlotRow {
-  id: string;
-  advertiser_name: string;
-  advertiser_url: string;
-  logo_url: string | null;
-  tagline: string | null;
 }
 
 // ─────────────────────────────────────────────
@@ -194,233 +184,6 @@ function TrustScore({ score }: { score: number | null }) {
   );
 }
 
-// ─────────────────────────────────────────────
-// Leaderboard sidebars (TrustMRR-style sponsors)
-// ─────────────────────────────────────────────
-function SponsorLogoCircle({
-  name,
-  logoUrl,
-}: Readonly<{ name: string; logoUrl: string | null }>) {
-  const initial = name.charAt(0).toUpperCase();
-  if (logoUrl) {
-    return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
-        src={logoUrl}
-        alt=""
-        width={44}
-        height={44}
-        className="mx-auto size-11 rounded-full object-cover ring-2 ring-gray-100 bg-white"
-      />
-    );
-  }
-  return (
-    <span
-      aria-hidden
-      className="mx-auto flex size-11 items-center justify-center rounded-full border border-gray-200 bg-gray-100 text-sm font-semibold text-gray-500"
-    >
-      {initial || "?"}
-    </span>
-  );
-}
-
-function SponsorAdCard({
-  slot,
-}: Readonly<{ slot: LeaderboardAdSlotRow | null }>) {
-  const placeholderLine =
-    "Your brand here → contact@agenttrust.com · From $299/mo";
-
-  if (!slot) {
-    return (
-      <div className="rounded-xl border border-gray-200 bg-gray-50/90 p-3 text-center shadow-sm">
-        <div
-          className="mx-auto size-11 rounded-full border-2 border-dashed border-gray-300 bg-white"
-          aria-hidden
-        />
-        <p className="mt-2 text-xs font-semibold text-gray-800">Your brand here</p>
-        <p className="mt-1 text-[11px] leading-snug text-gray-500">
-          {placeholderLine}
-        </p>
-        <a
-          href="mailto:contact@agenttrust.com"
-          className="mt-2 inline-block text-xs font-medium text-indigo-600 hover:text-indigo-800 underline-offset-2 hover:underline"
-        >
-          contact@agenttrust.com
-        </a>
-      </div>
-    );
-  }
-
-  return (
-    <div className="rounded-xl border border-gray-200 bg-gray-50/90 p-3 text-center shadow-sm">
-      <SponsorLogoCircle name={slot.advertiser_name} logoUrl={slot.logo_url} />
-      <p className="mt-2 text-xs font-semibold text-gray-900 line-clamp-2">
-        {slot.advertiser_name}
-      </p>
-      {slot.tagline ? (
-        <p className="mt-1 text-[11px] leading-snug text-gray-600 line-clamp-3">
-          {slot.tagline}
-        </p>
-      ) : null}
-      <a
-        href={slot.advertiser_url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="mt-2 inline-block text-xs font-medium text-indigo-600 hover:text-indigo-800 underline-offset-2 hover:underline break-all"
-      >
-        Visit sponsor
-      </a>
-    </div>
-  );
-}
-
-function LeaderboardAdvertiseCard() {
-  return (
-    <div className="rounded-xl border border-indigo-200 bg-indigo-50/70 p-3 text-center shadow-sm">
-      <p className="text-xs font-semibold uppercase tracking-wide text-indigo-800">
-        Advertise here
-      </p>
-      <p className="mt-2 text-lg font-bold text-gray-900">$299/mo</p>
-      <a
-        href="mailto:contact@agenttrust.com"
-        className="mt-2 inline-block text-xs font-medium text-indigo-600 hover:text-indigo-800 underline-offset-2 hover:underline"
-      >
-        contact@agenttrust.com
-      </a>
-    </div>
-  );
-}
-
-// ─────────────────────────────────────────────
-// Skeleton rows
-// ─────────────────────────────────────────────
-const SPONSOR_TICKER_PLACEHOLDERS: LeaderboardAdSlotRow[] = [
-  {
-    id: "placeholder-1",
-    advertiser_name: "Your brand here",
-    advertiser_url: "mailto:contact@agenttrust.com",
-    logo_url: null,
-    tagline: "Sponsor this spot",
-  },
-  {
-    id: "placeholder-2",
-    advertiser_name: "Your brand here",
-    advertiser_url: "mailto:contact@agenttrust.com",
-    logo_url: null,
-    tagline: "Reach product buyers",
-  },
-  {
-    id: "placeholder-3",
-    advertiser_name: "Your brand here",
-    advertiser_url: "mailto:contact@agenttrust.com",
-    logo_url: null,
-    tagline: "Featured sponsor",
-  },
-  {
-    id: "placeholder-4",
-    advertiser_name: "Your brand here",
-    advertiser_url: "mailto:contact@agenttrust.com",
-    logo_url: null,
-    tagline: "From $299/mo",
-  },
-  {
-    id: "placeholder-5",
-    advertiser_name: "Your brand here",
-    advertiser_url: "mailto:contact@agenttrust.com",
-    logo_url: null,
-    tagline: "Contact AgentTrust",
-  },
-];
-
-function SponsorTickerLogo({
-  name,
-  logoUrl,
-}: Readonly<{ name: string; logoUrl: string | null }>) {
-  const initial = name.charAt(0).toUpperCase();
-
-  if (logoUrl) {
-    return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
-        src={logoUrl}
-        alt=""
-        width={28}
-        height={28}
-        className="size-7 shrink-0 rounded-full border border-gray-100 bg-white object-cover"
-      />
-    );
-  }
-
-  return (
-    <span
-      aria-hidden
-      className="flex size-7 shrink-0 items-center justify-center rounded-full border border-gray-200 bg-gray-100 text-[11px] font-bold text-gray-500"
-    >
-      {initial || "?"}
-    </span>
-  );
-}
-
-function SponsorTicker({ adSlots }: Readonly<{ adSlots: LeaderboardAdSlotRow[] }>) {
-  const sponsors =
-    adSlots.length > 0
-      ? [...adSlots, ...adSlots, ...adSlots]
-      : [
-          ...SPONSOR_TICKER_PLACEHOLDERS,
-          ...SPONSOR_TICKER_PLACEHOLDERS,
-          ...SPONSOR_TICKER_PLACEHOLDERS,
-        ];
-  const tickerItems = [...sponsors, ...sponsors];
-
-  return (
-    <div className="ticker-wrapper w-full overflow-hidden md:hidden">
-      <div className="ticker-track py-1">
-        {tickerItems.map((slot, index) => (
-          <a
-            key={`${slot.id}-${index}`}
-            href={slot.advertiser_url}
-            target={slot.advertiser_url.startsWith("mailto:") ? undefined : "_blank"}
-            rel={slot.advertiser_url.startsWith("mailto:") ? undefined : "noopener noreferrer"}
-            className="mr-4 flex h-12 w-[180px] shrink-0 items-center gap-2 rounded-full border border-gray-200 bg-white px-3 shadow-sm"
-            aria-label={slot.advertiser_name}
-          >
-            <SponsorTickerLogo name={slot.advertiser_name} logoUrl={slot.logo_url} />
-            <span className="min-w-0">
-              <span className="block truncate text-[13px] font-bold leading-tight text-gray-900">
-                {slot.advertiser_name}
-              </span>
-              <span className="block truncate text-[11px] leading-tight text-gray-500">
-                {slot.tagline ?? "Featured sponsor"}
-              </span>
-            </span>
-          </a>
-        ))}
-      </div>
-      <style>{`
-        @keyframes marquee {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-
-        .ticker-wrapper {
-          overflow: hidden;
-          width: 100%;
-        }
-
-        .ticker-track {
-          display: flex;
-          width: max-content;
-          animation: marquee 30s linear infinite;
-        }
-
-        .ticker-track:hover {
-          animation-play-state: paused;
-        }
-      `}</style>
-    </div>
-  );
-}
-
 function SkeletonRow() {
   return (
     <tr className="border-b border-gray-100 animate-pulse">
@@ -443,38 +206,6 @@ export default function LeaderboardPage() {
   const [data, setData] = useState<LeaderboardResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [adSlots, setAdSlots] = useState<LeaderboardAdSlotRow[]>([]);
-
-  useEffect(() => {
-    async function loadAdSlots() {
-      try {
-        const supabase = createBrowserSupabaseClient();
-        const { data: rows } = await supabase
-          .from("ad_slots")
-          .select("id, advertiser_name, advertiser_url, logo_url, tagline")
-          .eq("is_active", true)
-          .order("created_at", { ascending: true })
-          .limit(8);
-
-        if (!rows) {
-          setAdSlots([]);
-          return;
-        }
-
-        const cleaned: LeaderboardAdSlotRow[] = rows.map((r) => ({
-          id: r.id as string,
-          advertiser_name: r.advertiser_name as string,
-          advertiser_url: r.advertiser_url as string,
-          logo_url: (r.logo_url as string | null) ?? null,
-          tagline: (r.tagline as string | null) ?? null,
-        }));
-        setAdSlots(cleaned);
-      } catch {
-        setAdSlots([]);
-      }
-    }
-    void loadAdSlots();
-  }, []);
 
   const fetchLeaderboard = useCallback(async () => {
     setLoading(true);
@@ -528,24 +259,7 @@ export default function LeaderboardPage() {
       </div>
 
       <div className="mx-auto max-w-[1200px] px-4 sm:px-6 py-8">
-        <div className="grid md:grid-cols-[160px_minmax(0,1fr)_160px] grid-cols-1 gap-6">
-          {/* Left sidebar — Sponsors */}
-          <aside className="hidden md:block md:w-[160px] shrink-0 self-start md:sticky md:top-24 md:z-10">
-            <div className="space-y-4">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-gray-400">
-                Sponsors
-              </p>
-              <SponsorAdCard slot={adSlots[0] ?? null} />
-              <SponsorAdCard slot={adSlots[1] ?? null} />
-            </div>
-          </aside>
-
-          {/* Center — leaderboard */}
-          <div className="min-w-0 w-full">
-          <div className="mb-6 md:hidden">
-            <SponsorTicker adSlots={adSlots} />
-          </div>
-
+        <div className="min-w-0 w-full">
           {/* Filters row */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             {/* Category tabs */}
@@ -743,19 +457,6 @@ export default function LeaderboardPage() {
               {data.total} product{data.total !== 1 ? "s" : ""} listed
             </p>
           )}
-          <div className="mt-6 md:hidden">
-            <SponsorTicker adSlots={adSlots} />
-          </div>
-          </div>
-
-          {/* Right sidebar — sponsors + advertise CTA */}
-          <aside className="hidden md:block md:w-[160px] shrink-0 self-start md:sticky md:top-24 md:z-10">
-            <div className="space-y-4">
-              <SponsorAdCard slot={adSlots[2] ?? null} />
-              <SponsorAdCard slot={adSlots[3] ?? null} />
-              <LeaderboardAdvertiseCard />
-            </div>
-          </aside>
         </div>
       </div>
       <PublicFooter />

@@ -4,14 +4,26 @@ import { z } from "zod";
 import { dodoClient } from "@/lib/dodo";
 import { createClient } from "@/lib/supabase/server";
 
-const checkoutSchema = z.object({
-  plan: z.enum(["starter", "growth", "scale"]),
-});
+const checkoutSchema = z.union([
+  z.object({
+    plan: z.enum(["starter", "growth", "scale"]),
+    promotion: z.never().optional(),
+  }),
+  z.object({
+    promotion: z.enum(["weekly", "monthly"]),
+    plan: z.never().optional(),
+  }),
+]);
 
 const PLAN_TO_PRODUCT_ID: Record<"starter" | "growth" | "scale", string | undefined> = {
   starter: process.env.DODO_STARTER_PRODUCT_ID,
   growth: process.env.DODO_GROWTH_PRODUCT_ID,
   scale: process.env.DODO_SCALE_PRODUCT_ID,
+};
+
+const PROMOTION_TO_PRODUCT_ID: Record<"weekly" | "monthly", string | undefined> = {
+  weekly: process.env.DODO_PROMOTION_WEEKLY_PRODUCT_ID,
+  monthly: process.env.DODO_PROMOTION_MONTHLY_PRODUCT_ID,
 };
 
 function appUrl() {
@@ -40,10 +52,18 @@ export async function POST(request: Request) {
     );
   }
 
-  const productId = PLAN_TO_PRODUCT_ID[parsed.data.plan];
+  const checkoutInput = parsed.data;
+  const isPlanCheckout = "plan" in checkoutInput && checkoutInput.plan !== undefined;
+  const productId = isPlanCheckout
+    ? PLAN_TO_PRODUCT_ID[checkoutInput.plan]
+    : PROMOTION_TO_PRODUCT_ID[checkoutInput.promotion];
+  const productLabel = isPlanCheckout
+    ? `${checkoutInput.plan} plan`
+    : `${checkoutInput.promotion} promotion`;
+
   if (!productId) {
     return NextResponse.json(
-      { error: `Missing Dodo product ID for ${parsed.data.plan} plan.` },
+      { error: `Missing Dodo product ID for ${productLabel}.` },
       { status: 500 },
     );
   }
@@ -62,10 +82,12 @@ export async function POST(request: Request) {
           email: user.email ?? "",
           name: profile?.full_name ?? user.user_metadata.full_name ?? "AgentTrust User",
         },
-    return_url: `${appUrl()}/dashboard/billing`,
+    return_url: isPlanCheckout ? `${appUrl()}/dashboard/billing` : `${appUrl()}/leaderboard`,
     metadata: {
       user_id: user.id,
-      plan: parsed.data.plan,
+      ...(isPlanCheckout
+        ? { plan: checkoutInput.plan }
+        : { promotion: checkoutInput.promotion }),
     },
   });
 

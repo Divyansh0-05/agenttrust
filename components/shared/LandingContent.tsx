@@ -23,17 +23,17 @@ type Tab = "top" | "live" | "recent" | "most_reviewed";
 
 const TABS: Array<{ label: string; value: Tab }> = [
   { label: "Top", value: "top" },
-  { label: "🔴 Live", value: "live" },
+  { label: "Live", value: "live" },
   { label: "Recent", value: "recent" },
   { label: "Most Reviewed", value: "most_reviewed" },
 ];
 
-const PLATFORMS = [
-  "Stripe",
-  "Lemon Squeezy",
-  "RevenueCat",
-  "Dodo Payments",
-  "Paddle",
+const PLATFORMS: Array<{ name: string; mark: string; wordmark: string }> = [
+  { name: "Stripe", mark: "S", wordmark: "stripe" },
+  { name: "Lemon Squeezy", mark: "LS", wordmark: "lemon" },
+  { name: "RevenueCat", mark: "RC", wordmark: "RevenueCat" },
+  { name: "Dodo Payments", mark: "D", wordmark: "dodo" },
+  { name: "Paddle", mark: "P", wordmark: "paddle" },
 ];
 
 function getLogoColor(name: string): string {
@@ -127,40 +127,31 @@ function Navbar() {
 
 function Hero() {
   return (
-    <section className="px-6 py-16 text-center bg-white border-b border-gray-100">
-      <div className="inline-flex gap-2 justify-center mb-6">
-        {["⬡ MCP", "◈ Trust API", "▲ AgentUP"].map((pill) => (
-          <span
-            key={pill}
-            className="text-xs px-3 py-1 rounded-full border border-gray-200 text-gray-500 flex items-center gap-1.5"
-          >
-            {pill}
-          </span>
-        ))}
-      </div>
-
-      <h1 className="text-4xl font-semibold text-gray-900 leading-tight mb-4">
-        Verified trust for{" "}
-        <span className="text-violet-600">people and AI agents</span>
-      </h1>
-
-      <p className="text-base text-gray-500 max-w-xl mx-auto mb-8 leading-relaxed">
-        Collect reviews. Verify revenue across Stripe, Lemon Squeezy,
-        RevenueCat and more. Let AI agents query your trust data.
+    <section className="border-b border-gray-100 bg-white px-6 py-9 text-center sm:py-11">
+      <p className="mx-auto mb-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-violet-500">
+        Verified trust for people and AI agents
       </p>
 
-      <div className="flex gap-4 justify-center">
+      <h1 className="mx-auto mb-3 max-w-3xl text-4xl font-semibold leading-[1.05] tracking-tight text-gray-950 sm:text-5xl">
+        The Trust Layer For AI-Native Products
+      </h1>
+
+      <p className="mx-auto mb-6 max-w-2xl text-sm leading-6 text-gray-500 sm:text-base">
+        Collect reviews, verify revenue, and publish trust signals that people and AI agents can inspect before they choose what to use.
+      </p>
+
+      <div className="flex flex-wrap justify-center gap-3">
         <Link
           href="/signup"
-          className="bg-violet-600 text-white px-7 py-2.5 rounded-xl font-medium hover:bg-violet-700 transition-colors"
+          className="rounded-xl bg-violet-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-violet-200/60 transition-colors hover:bg-violet-700"
         >
-          Submit
+          Submit product
         </Link>
         <Link
           href="/leaderboard"
-          className="border border-gray-200 text-gray-700 px-7 py-2.5 rounded-xl hover:bg-gray-50 transition-colors"
+          className="rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 transition-colors hover:border-gray-300 hover:bg-gray-50"
         >
-          Browse
+          Browse products
         </Link>
       </div>
     </section>
@@ -169,19 +160,28 @@ function Hero() {
 
 function PlatformStrip() {
   return (
-    <section className="bg-white">
-      <p className="text-xs text-gray-400 text-center pt-4">
-        Verified revenue from
-      </p>
-      <div className="flex flex-wrap gap-6 justify-center py-3 border-b border-gray-100 px-6">
-        {PLATFORMS.map((platform) => (
-          <span
-            key={platform}
-            className="text-xs font-medium text-gray-400 hover:text-gray-600"
-          >
-            {platform}
-          </span>
-        ))}
+    <section className="border-b border-gray-100 bg-white px-6 py-4">
+      <div className="mx-auto flex max-w-4xl flex-col items-center gap-3 sm:flex-row sm:justify-center">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-gray-400">
+          Trusted integrations
+        </p>
+        <div className="flex flex-wrap items-center justify-center gap-2.5">
+          {PLATFORMS.map((platform) => (
+            <span
+              key={platform.name}
+              className="group relative inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs font-semibold text-gray-500 transition-all hover:border-violet-200 hover:bg-white hover:text-gray-800 hover:shadow-sm"
+              aria-label={platform.name}
+            >
+              <span className="flex h-5 min-w-5 items-center justify-center rounded-full border border-gray-200 bg-white px-1 text-[9px] font-bold tracking-tight text-gray-400 group-hover:border-violet-200 group-hover:text-violet-600">
+                {platform.mark}
+              </span>
+              <span className="tracking-tight">{platform.wordmark}</span>
+              <span className="pointer-events-none absolute left-1/2 top-full z-20 mt-2 -translate-x-1/2 whitespace-nowrap rounded-md border border-gray-200 bg-white px-2 py-1 text-[11px] font-medium text-gray-600 opacity-0 shadow-sm transition-opacity group-hover:opacity-100">
+                {platform.name}
+              </span>
+            </span>
+          ))}
+        </div>
       </div>
     </section>
   );
@@ -331,33 +331,47 @@ export default function LandingContent({
       <Hero />
       <PlatformStrip />
 
-      <div className="flex gap-0 border-b border-gray-100 bg-white sticky top-[53px] z-[9] px-6">
-        {TABS.map((tab) => (
-          <button
-            key={tab.value}
-            type="button"
-            onClick={() => setActiveTab(tab.value)}
-            className={`text-sm px-4 py-3 cursor-pointer border-b-2 border-transparent text-gray-500 hover:text-gray-800 transition-colors ${
-              activeTab === tab.value
-                ? "text-violet-600 border-b-2 border-violet-600 font-medium"
-                : ""
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
+      <div className="sticky top-[53px] z-[9] border-b border-gray-100 bg-white/95 px-4 py-3 backdrop-blur sm:px-6">
+        <div className="mx-auto flex max-w-5xl items-center gap-2 overflow-x-auto rounded-2xl border border-gray-200 bg-gray-50 p-1 shadow-sm">
+          {TABS.map((tab) => {
+            const isActive = activeTab === tab.value;
+
+            return (
+              <button
+                key={tab.value}
+                type="button"
+                onClick={() => setActiveTab(tab.value)}
+                className={`relative shrink-0 cursor-pointer rounded-xl px-4 py-2 text-sm font-semibold transition-all ${
+                  isActive
+                    ? "bg-white text-violet-700 shadow-sm ring-1 ring-violet-100"
+                    : "text-gray-500 hover:bg-white/70 hover:text-gray-800"
+                }`}
+              >
+                {tab.value === "live" ? (
+                  <span className="mr-1.5 inline-block size-1.5 rounded-full bg-emerald-500 align-middle shadow-[0_0_0_3px_rgba(16,185,129,0.12)]" />
+                ) : null}
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
-      <section>
-        <div className="flex items-center justify-between px-6 py-3">
-          <h2 className="text-sm font-medium text-gray-600">
-            Today&apos;s top products
-          </h2>
+      <section className="bg-white">
+        <div className="flex flex-col gap-2 px-6 py-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="text-sm font-semibold text-gray-800">
+              Today&apos;s top products
+            </h2>
+            <p className="mt-0.5 text-xs text-gray-400">
+              Strong reviews and AgentUPs earn products free visibility across AgentTrust.
+            </p>
+          </div>
           <Link
             href="/leaderboard"
-            className="text-sm text-violet-600 hover:text-violet-700"
+            className="text-sm font-semibold text-violet-600 transition-colors hover:text-violet-700"
           >
-            See all →
+            See all -&gt;
           </Link>
         </div>
 

@@ -69,7 +69,7 @@ export function AgentUpButton({
   }
 
   return (
-    <div className="flex flex-col items-center gap-0.5 min-w-[52px]">
+    <div className="flex flex-col items-center gap-0.5 min-width: 52px">
       <span className="text-lg font-semibold text-gray-800">{count}</span>
       <span className="text-[10px] text-gray-400 uppercase tracking-wide">
         AgentUPs
