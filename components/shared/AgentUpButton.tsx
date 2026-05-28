@@ -69,9 +69,9 @@ export function AgentUpButton({
   }
 
   return (
-    <div className="flex flex-col items-center gap-0.5 min-width: 52px">
-      <span className="text-lg font-semibold text-gray-800">{count}</span>
-      <span className="text-[10px] text-gray-400 uppercase tracking-wide">
+    <div className="flex min-w-[52px] flex-col items-center gap-0.5">
+      <span className="text-sm font-black leading-none text-white">{count}</span>
+      <span className="text-[9px] font-black uppercase tracking-wide text-zinc-600">
         AgentUPs
       </span>
       <button
@@ -80,17 +80,17 @@ export function AgentUpButton({
         onClick={handleAgentUp}
         className={[
           upped
-            ? "bg-violet-600 text-white text-xs font-medium px-2.5 py-1 rounded-lg border border-violet-600 cursor-default"
-            : "bg-violet-50 hover:bg-violet-100 text-violet-700 text-xs font-medium px-2.5 py-1 rounded-lg border border-violet-100 transition-all active:scale-95",
+            ? "cursor-default rounded-md border border-orange-400/25 bg-orange-500/15 px-2 py-1 text-[10px] font-black text-orange-200"
+            : "rounded-md border border-white/10 bg-white/[0.05] px-2 py-1 text-[10px] font-black text-white transition-all hover:border-orange-400/30 hover:bg-orange-500/15 active:scale-95",
           loading ? "opacity-50 cursor-not-allowed" : "",
         ]
           .filter(Boolean)
           .join(" ")}
       >
-        ▲ UP
+        UP
       </button>
       {toastMessage ? (
-        <div className="fixed bottom-4 right-4 bg-gray-900 text-white text-xs px-4 py-2 rounded-lg">
+        <div className="fixed bottom-4 right-4 z-[70] rounded-lg border border-white/10 bg-zinc-950 px-4 py-2 text-xs text-white shadow-xl">
           {toastMessage}
         </div>
       ) : null}

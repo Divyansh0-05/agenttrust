@@ -62,28 +62,28 @@ export default function AdvertiseHereCard() {
   }
 
   return (
-    <div className="relative rounded-xl border border-indigo-200 bg-indigo-50/70 p-3 text-center shadow-sm">
-      <div className="mx-auto flex size-11 items-center justify-center rounded-full border border-indigo-200 bg-white text-indigo-600">
-        <Megaphone className="size-5" aria-hidden />
+    <div className="relative flex min-h-[88px] flex-col items-center justify-center rounded-xl border border-dashed border-white/10 bg-black px-3 py-2.5 text-center">
+      <div className="mx-auto flex size-8 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] text-zinc-500">
+        <Megaphone className="size-4" aria-hidden />
       </div>
-      <p className="mt-2 text-xs font-semibold uppercase tracking-wide text-indigo-800">
+      <p className="mt-1.5 text-[11px] font-semibold uppercase tracking-wide text-zinc-500">
         Advertise Here
       </p>
-      <p className="mt-1 text-[11px] leading-snug text-gray-600">
+      <p className="mt-1 text-[10px] leading-snug text-zinc-600">
         Promote your product and get featured on AgentTrust.
       </p>
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
-        className="mt-2 inline-flex rounded-lg border border-indigo-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-indigo-700 transition-colors hover:border-indigo-300 hover:text-indigo-900"
+        className="mt-1.5 inline-flex rounded-lg border border-white/10 bg-white/[0.04] px-2 py-1 text-[10px] font-semibold text-zinc-300 transition-colors hover:border-orange-400/30 hover:text-white"
         aria-expanded={open}
       >
         View options
       </button>
 
       {open ? (
-        <div className="absolute bottom-full right-0 z-30 mb-2 w-64 rounded-xl border border-gray-200 bg-white p-3 text-left shadow-lg">
-          <p className="text-sm font-semibold text-gray-900">Promotion slots</p>
+        <div className="absolute bottom-full right-0 z-30 mb-2 w-64 rounded-lg border border-white/10 bg-zinc-950 p-3 text-left shadow-2xl">
+          <p className="text-sm font-semibold text-white">Promotion slots</p>
           <div className="mt-3 space-y-2">
             {OPTIONS.map((option) => (
               <button
@@ -91,18 +91,18 @@ export default function AdvertiseHereCard() {
                 type="button"
                 onClick={() => startCheckout(option.cadence)}
                 disabled={loading !== null}
-                className="block w-full rounded-lg border border-gray-200 bg-gray-50 p-3 text-left transition-all hover:border-indigo-200 hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
+                className="block w-full rounded-lg border border-white/10 bg-white/[0.04] p-3 text-left transition-all hover:border-orange-400/30 hover:bg-orange-500/10 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                <span className="block text-xs font-semibold text-gray-900">
+                <span className="block text-xs font-semibold text-white">
                   {option.title}
                 </span>
-                <span className="mt-1 block text-[11px] leading-snug text-gray-500">
+                <span className="mt-1 block text-[11px] leading-snug text-zinc-500">
                   {loading === option.cadence ? "Starting checkout..." : option.description}
                 </span>
               </button>
             ))}
           </div>
-          {error ? <p className="mt-2 text-[11px] text-red-600">{error}</p> : null}
+          {error ? <p className="mt-2 text-[11px] text-red-300">{error}</p> : null}
         </div>
       ) : null}
     </div>

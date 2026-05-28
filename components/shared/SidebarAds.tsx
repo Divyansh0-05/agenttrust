@@ -58,7 +58,7 @@ function LogoMark({
         alt=""
         width={44}
         height={44}
-        className="mx-auto size-11 rounded-full bg-white object-cover ring-2 ring-gray-100"
+        className="mx-auto size-9 rounded-lg bg-zinc-950 object-cover ring-1 ring-white/10"
       />
     );
   }
@@ -66,7 +66,7 @@ function LogoMark({
   return (
     <span
       aria-hidden
-      className="mx-auto flex size-11 items-center justify-center rounded-full border border-gray-200 bg-gray-100 text-sm font-semibold text-gray-500"
+      className="mx-auto flex size-9 items-center justify-center rounded-lg border border-white/10 bg-black/35 text-sm font-semibold text-white"
     >
       {initial || "?"}
     </span>
@@ -75,31 +75,39 @@ function LogoMark({
 
 function ProductCard({ product }: Readonly<{ product: SidebarProduct }>) {
   const tagline = product.tagline ?? "Trusted product on AgentTrust";
+  const tint =
+    product.name.charCodeAt(0) % 4 === 0
+      ? "bg-[#2c1730]"
+      : product.name.charCodeAt(0) % 4 === 1
+        ? "bg-[#123312]"
+        : product.name.charCodeAt(0) % 4 === 2
+          ? "bg-[#1a1b3b]"
+          : "bg-[#202020]";
 
   return (
     <a
       href={`/p/${product.slug}`}
-      className="block rounded-xl border border-gray-200 bg-gray-50/90 p-3 text-center shadow-sm no-underline transition-all hover:border-indigo-200 hover:bg-white hover:shadow"
+      className={`flex min-h-[118px] flex-col items-center justify-center rounded-xl border border-white/10 px-3 py-3 text-center no-underline shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] transition-all hover:-translate-y-0.5 hover:border-orange-400/25 hover:brightness-125 ${tint}`}
     >
       <LogoMark name={product.name} logoUrl={product.logo_url} />
-      <p className="mt-2 line-clamp-2 text-xs font-semibold text-gray-900">
+      <p className="mt-2 line-clamp-1 text-sm font-semibold text-white">
         {product.name}
       </p>
       <p
-        className={`mt-1 line-clamp-3 text-[11px] leading-snug ${
-          product.tagline ? "text-gray-600" : "text-gray-400"
+        className={`mt-1 line-clamp-2 text-[11px] leading-snug ${
+          product.tagline ? "text-zinc-300" : "text-zinc-500"
         }`}
       >
         {tagline}
       </p>
-      <div className="mt-2 flex items-center justify-center gap-2 text-[11px]">
-        <span className="font-medium text-indigo-600">
+      <div className="mt-2 flex items-center justify-center gap-1.5 text-[10px]">
+        <span className="font-semibold text-cyan-200">
           {product.agentup_count ?? 0} AgentUPs
         </span>
-        <span className="text-gray-300" aria-hidden>
+        <span className="text-white/25" aria-hidden>
           /
         </span>
-        <span className="text-gray-500">{product.review_count ?? 0} reviews</span>
+        <span className="text-zinc-400">{product.review_count ?? 0} reviews</span>
       </div>
     </a>
   );
@@ -111,23 +119,23 @@ function PaidAdCard({ slot }: Readonly<{ slot: PaidAdSlot }>) {
       href={slot.advertiser_url}
       target="_blank"
       rel="noopener noreferrer"
-      className="block rounded-xl border border-gray-200 bg-gray-50/90 p-3 text-center shadow-sm no-underline transition-all hover:border-indigo-200 hover:bg-white hover:shadow"
+      className="flex min-h-[118px] flex-col items-center justify-center rounded-xl border border-white/10 bg-[#171f39] px-3 py-3 text-center no-underline shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] transition-all hover:-translate-y-0.5 hover:border-orange-400/25 hover:brightness-125"
     >
       <LogoMark name={slot.advertiser_name} logoUrl={slot.logo_url} />
       <div className="mt-2 flex items-center justify-center gap-2">
-        <p className="line-clamp-2 text-xs font-semibold text-gray-900">
+        <p className="line-clamp-1 text-sm font-semibold text-white">
           {slot.advertiser_name}
         </p>
-        <span className="rounded-full border border-indigo-200 bg-indigo-50 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-indigo-700">
+        <span className="rounded-full border border-orange-400/25 bg-orange-500/10 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-orange-300">
           Ad
         </span>
       </div>
       {slot.tagline ? (
-        <p className="mt-1 line-clamp-3 text-[11px] leading-snug text-gray-600">
+        <p className="mt-1 line-clamp-2 text-[11px] leading-snug text-zinc-300">
           {slot.tagline}
         </p>
       ) : null}
-      <span className="mt-2 inline-block text-xs font-medium text-indigo-600 underline-offset-2 hover:text-indigo-800 hover:underline">
+      <span className="mt-2 inline-block text-[10px] font-semibold text-cyan-200 underline-offset-2 hover:text-white hover:underline">
         Visit sponsor
       </span>
     </a>
@@ -136,11 +144,11 @@ function PaidAdCard({ slot }: Readonly<{ slot: PaidAdSlot }>) {
 
 function PlacementNote() {
   return (
-    <div className="rounded-xl border border-indigo-100 bg-indigo-50/70 p-3 text-center shadow-sm">
-      <p className="text-xs font-semibold text-indigo-800">
+    <div className="flex min-h-[88px] flex-col items-center justify-center rounded-xl border border-dashed border-white/10 bg-black px-3 py-3 text-center">
+      <p className="text-xs font-semibold text-zinc-500">
         Earn free placement
       </p>
-      <p className="mt-1 text-[11px] leading-snug text-indigo-700">
+      <p className="mt-1 text-[10px] leading-snug text-zinc-600">
         Reviews, AgentUPs, and trust activity help products appear here.
       </p>
     </div>
@@ -161,7 +169,7 @@ function MobileLogo({
         alt=""
         width={30}
         height={30}
-        className="size-[30px] shrink-0 rounded-full border border-gray-100 bg-white object-cover dark:border-slate-700"
+        className="size-[30px] shrink-0 rounded-lg border border-white/10 bg-zinc-950 object-cover"
       />
     );
   }
@@ -169,7 +177,7 @@ function MobileLogo({
   return (
     <span
       aria-hidden
-      className="flex size-[30px] shrink-0 items-center justify-center rounded-full border border-gray-200 bg-gray-100 text-[11px] font-bold text-gray-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
+      className="flex size-[30px] shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/[0.06] text-[11px] font-black text-white"
     >
       {initial || "?"}
     </span>
@@ -182,14 +190,14 @@ function MobileTickerCard({ item }: Readonly<{ item: MobileAdItem }>) {
       href={item.href}
       target={item.external ? "_blank" : undefined}
       rel={item.external ? "noopener noreferrer" : undefined}
-      className="flex h-10 w-[180px] shrink-0 items-center gap-2 rounded-full border border-gray-200 bg-white px-2.5 shadow-sm no-underline transition-colors hover:border-indigo-200 dark:border-slate-700 dark:bg-slate-950"
+      className="flex h-10 w-[180px] shrink-0 items-center gap-2 rounded-full border border-white/10 bg-zinc-950 px-2.5 shadow-sm no-underline transition-colors hover:border-cyan-300/30"
     >
       <MobileLogo name={item.name} logoUrl={item.logoUrl} />
       <span className="min-w-0">
-        <span className="block truncate text-[12px] font-semibold leading-tight text-gray-900 dark:text-slate-100">
+        <span className="block truncate text-[12px] font-semibold leading-tight text-white">
           {item.name}
         </span>
-        <span className="block truncate text-[10px] font-medium leading-tight text-indigo-600 dark:text-indigo-300">
+        <span className="block truncate text-[10px] font-semibold leading-tight text-zinc-400">
           {item.label}
         </span>
       </span>
@@ -274,10 +282,14 @@ export async function SidebarAds({
   const rankedProducts = ((products ?? []) as SidebarProduct[])
     .sort((a, b) => rankProduct(b) - rankProduct(a))
     .slice(0, placement === "mobile" ? 8 : 10);
-  const slots = rankedProducts
+  const baseSlots = rankedProducts
     .filter((_, index) => (side === "left" ? index % 2 === 0 : index % 2 === 1))
     .slice(0, placement === "mobile" ? 4 : 5);
   const paidSlot = ((paidSlots ?? [])[0] as PaidAdSlot | undefined) ?? null;
+  const slots =
+    placement === "desktop" && paidSlot && side === "left"
+      ? baseSlots.slice(0, 4)
+      : baseSlots;
 
   if (placement === "mobile") {
     const mobileItems: MobileAdItem[] = [
@@ -308,16 +320,18 @@ export async function SidebarAds({
   }
 
   return (
-    <div className="w-full">
-      <p className="px-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-gray-400">
-        {side === "left" ? "Top Products" : "Trending"}
-      </p>
-      <div className="mt-3 flex flex-col gap-3">
+    <div className="w-full bg-black px-2 py-2">
+      <div className="flex flex-col gap-2">
         {paidSlot && side === "left" ? <PaidAdCard slot={paidSlot} /> : null}
         {slots.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}
-        {placement === "desktop" ? <PlacementNote /> : null}
+        {placement === "desktop" &&
+        !showAdvertiseCta &&
+        !(paidSlot && side === "left") &&
+        slots.length < 5 ? (
+          <PlacementNote />
+        ) : null}
         {showAdvertiseCta ? <AdvertiseHereCard /> : null}
       </div>
     </div>

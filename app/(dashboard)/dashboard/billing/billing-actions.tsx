@@ -53,36 +53,36 @@ export function BillingActions({
     cta: string;
     featured?: boolean;
   }> = [
-    {
-      id: "free",
-      name: "Free",
-      price: "$0/mo",
-      description: "Public profile and basic trust presence.",
-      cta: "Current plan",
-    },
-    {
-      id: "starter",
-      name: "Starter",
-      price: "$19/mo",
-      description: "Review campaigns and one product workspace.",
-      cta: "Upgrade to Starter",
-    },
-    {
-      id: "growth",
-      name: "Growth",
-      price: "$49/mo",
-      description: "Most popular for growing SaaS teams.",
-      cta: "Upgrade to Growth",
-      featured: true,
-    },
-    {
-      id: "scale",
-      name: "Scale",
-      price: "$99/mo",
-      description: "Expanded limits and advanced trust workflows.",
-      cta: "Upgrade to Scale",
-    },
-  ];
+      {
+        id: "free",
+        name: "Free",
+        price: "$0/mo",
+        description: "Public profile and basic trust presence.",
+        cta: "Current plan",
+      },
+      {
+        id: "starter",
+        name: "Starter",
+        price: "$19/mo",
+        description: "Review campaigns and one product workspace.",
+        cta: "Upgrade to Starter",
+      },
+      {
+        id: "growth",
+        name: "Growth",
+        price: "$49/mo",
+        description: "Most popular for growing SaaS teams.",
+        cta: "Upgrade to Growth",
+        featured: true,
+      },
+      {
+        id: "scale",
+        name: "Scale",
+        price: "$99/mo",
+        description: "Expanded limits and advanced trust workflows.",
+        cta: "Upgrade to Scale",
+      },
+    ];
 
   return (
     <div className="space-y-4">
@@ -112,19 +112,19 @@ export function BillingActions({
                 (() => {
                   const paidPlan = plan.id as "starter" | "growth" | "scale";
                   return (
-                <Button
-                  type="button"
-                  variant={isCurrent ? "outline" : "default"}
-                  disabled={isCurrent || loadingPlan === plan.id}
-                  className="mt-4 w-full"
-                  onClick={() => startCheckout(paidPlan)}
-                >
-                  {loadingPlan === plan.id
-                    ? "Redirecting..."
-                    : isCurrent
-                      ? "Current plan"
-                      : plan.cta}
-                </Button>
+                    <Button
+                      type="button"
+                      variant={isCurrent ? "outline" : "default"}
+                      disabled={isCurrent || loadingPlan === plan.id}
+                      className="mt-4 w-full"
+                      onClick={() => startCheckout(paidPlan)}
+                    >
+                      {loadingPlan === plan.id
+                        ? "Redirecting..."
+                        : isCurrent
+                          ? "Current plan"
+                          : plan.cta}
+                    </Button>
                   );
                 })()
               )}

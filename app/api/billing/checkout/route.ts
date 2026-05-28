@@ -79,9 +79,9 @@ export async function POST(request: Request) {
     customer: profile?.dodo_customer_id
       ? { customer_id: profile.dodo_customer_id }
       : {
-          email: user.email ?? "",
-          name: profile?.full_name ?? user.user_metadata.full_name ?? "AgentTrust User",
-        },
+        email: user.email ?? "",
+        name: profile?.full_name ?? user.user_metadata.full_name ?? "AgentTrust User",
+      },
     return_url: isPlanCheckout ? `${appUrl()}/dashboard/billing` : `${appUrl()}/leaderboard`,
     metadata: {
       user_id: user.id,

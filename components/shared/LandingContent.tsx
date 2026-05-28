@@ -1,5 +1,6 @@
 "use client";
 
+import { ChevronRight, Search } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
@@ -19,167 +20,213 @@ export interface LandingProduct {
   category: string | null;
 }
 
-type Tab = "top" | "live" | "recent" | "most_reviewed";
-
-const TABS: Array<{ label: string; value: Tab }> = [
-  { label: "Top", value: "top" },
-  { label: "Live", value: "live" },
-  { label: "Recent", value: "recent" },
-  { label: "Most Reviewed", value: "most_reviewed" },
-];
-
-const PLATFORMS: Array<{ name: string; mark: string; wordmark: string }> = [
-  { name: "Stripe", mark: "S", wordmark: "stripe" },
-  { name: "Lemon Squeezy", mark: "LS", wordmark: "lemon" },
-  { name: "RevenueCat", mark: "RC", wordmark: "RevenueCat" },
-  { name: "Dodo Payments", mark: "D", wordmark: "dodo" },
-  { name: "Paddle", mark: "P", wordmark: "paddle" },
-];
-
-function getLogoColor(name: string): string {
-  const firstLetter = name.charAt(0).toUpperCase();
-
-  if ("ABCDE".includes(firstLetter)) {
-    return "bg-violet-500";
-  }
-
-  if ("FGHIJ".includes(firstLetter)) {
-    return "bg-emerald-500";
-  }
-
-  if ("KLMNO".includes(firstLetter)) {
-    return "bg-orange-500";
-  }
-
-  if ("PQRST".includes(firstLetter)) {
-    return "bg-blue-500";
-  }
-
-  return "bg-pink-500";
+function scoreProduct(product: LandingProduct): number {
+  return (
+    (product.agentup_count ?? 0) * 0.6 +
+    (product.review_count ?? 0) * 0.25 +
+    (product.trust_score ?? 0) * 0.15
+  );
 }
 
-function ShieldIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      className="h-5 w-5 text-violet-600"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-      strokeWidth={1.8}
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M12 3.75 5.25 6v5.25c0 4.14 2.77 7.99 6.75 9 3.98-1.01 6.75-4.86 6.75-9V6L12 3.75Z"
+function brandTint(index: number): string {
+  const tints = [
+    "bg-[#2a1830]",
+    "bg-[#202123]",
+    "bg-[#351c1f]",
+    "bg-[#1f2630]",
+    "bg-[#221d31]",
+  ];
+
+  return tints[index % tints.length];
+}
+
+function ProductLogo({
+  product,
+  size = "md",
+}: {
+  product: LandingProduct;
+  size?: "sm" | "md";
+}) {
+  const sizeClass = size === "sm" ? "size-9 rounded-lg" : "size-11 rounded-xl";
+
+  if (product.logo_url) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={product.logo_url}
+        alt={product.name}
+        className={`${sizeClass} border border-white/10 object-cover`}
       />
-    </svg>
+    );
+  }
+
+  return (
+    <span
+      className={`${sizeClass} flex items-center justify-center border border-white/10 bg-zinc-700 text-sm font-semibold text-white`}
+    >
+      {product.name.charAt(0).toUpperCase() || "?"}
+    </span>
   );
 }
 
-function Navbar() {
+function NavPill() {
   return (
-    <header className="sticky top-0 z-10 bg-white/90 backdrop-blur-sm border-b border-gray-100">
-      <div className="flex items-center justify-between px-6 py-3">
-        <Link href="/" className="flex items-center gap-2">
-          <ShieldIcon />
-          <span className="text-base font-semibold text-gray-900">
-            AgentTrust
-          </span>
+    <nav className="mx-auto flex min-h-12 w-full max-w-[720px] items-center justify-between gap-2 rounded-full border border-white/15 bg-zinc-100 px-4 text-black shadow-[0_0_42px_rgba(255,255,255,0.12)] sm:px-5">
+      <Link href="/" className="hidden text-sm font-semibold tracking-tight sm:block">
+        AgentTrust
+      </Link>
+      <div className="flex flex-1 items-center justify-center gap-2 text-xs font-medium sm:gap-4 sm:text-sm">
+        <Link href="/leaderboard" className="hover:text-orange-600">
+          Leaderboard
         </Link>
-
-        <nav className="hidden md:flex text-sm text-gray-500 transition-colors gap-6">
-          <Link
-            href="/leaderboard"
-            className="hover:text-gray-800 transition-colors"
-          >
-            Leaderboard
-          </Link>
-          <Link
-            href="/trust-api"
-            className="hover:text-gray-800 transition-colors"
-          >
-            Trust API
-          </Link>
-          <Link href="/pricing" className="hover:text-gray-800 transition-colors">
-            Pricing
-          </Link>
-        </nav>
-
-        <div className="flex items-center gap-2">
-          <Link
-            href="/login"
-            className="text-sm px-4 py-1.5 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50"
-          >
-            Login
-          </Link>
-          <Link
-            href="/signup"
-            className="text-sm px-4 py-1.5 rounded-lg bg-violet-600 text-white hover:bg-violet-700 font-medium"
-          >
-            Sign up
-          </Link>
-        </div>
+        <Link href="/trust-api" className="hover:text-orange-600">
+          Trust API
+        </Link>
+        <Link href="/pricing" className="hover:text-orange-600">
+          Pricing
+        </Link>
       </div>
-    </header>
-  );
-}
-
-function Hero() {
-  return (
-    <section className="border-b border-gray-100 bg-white px-6 py-9 text-center sm:py-11">
-      <p className="mx-auto mb-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-violet-500">
-        Verified trust for people and AI agents
-      </p>
-
-      <h1 className="mx-auto mb-3 max-w-3xl text-4xl font-semibold leading-[1.05] tracking-tight text-gray-950 sm:text-5xl">
-        The Trust Layer For AI-Native Products
-      </h1>
-
-      <p className="mx-auto mb-6 max-w-2xl text-sm leading-6 text-gray-500 sm:text-base">
-        Collect reviews, verify revenue, and publish trust signals that people and AI agents can inspect before they choose what to use.
-      </p>
-
-      <div className="flex flex-wrap justify-center gap-3">
+      <div className="flex items-center gap-1.5">
+        <Link
+          href="/login"
+          className="rounded-full px-2.5 py-1.5 text-xs font-semibold hover:bg-black/10 sm:px-3"
+        >
+          Login
+        </Link>
         <Link
           href="/signup"
-          className="rounded-xl bg-violet-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-violet-200/60 transition-colors hover:bg-violet-700"
+          className="rounded-full bg-black px-3 py-1.5 text-xs font-semibold text-white hover:bg-orange-600"
         >
-          Submit product
+          Sign up
         </Link>
+      </div>
+    </nav>
+  );
+}
+
+function Hero({
+  query,
+  onQueryChange,
+}: {
+  query: string;
+  onQueryChange: (value: string) => void;
+}) {
+  return (
+    <section className="px-4 pb-7 pt-4 text-center sm:px-6">
+      <NavPill />
+      <p className="mt-5 text-base font-semibold tracking-tight text-zinc-100 sm:text-lg">
+        The Trust Layer For AI-Native Era
+      </p>
+      <h1 className="mx-auto mt-1 max-w-4xl text-balance text-4xl font-semibold leading-[1.02] tracking-tight text-white sm:text-6xl lg:text-7xl">
+        Reach <span className="text-orange-400">AI Agents &amp; Humans</span>{" "}
+        Faster
+      </h1>
+
+      <div className="mx-auto mt-7 flex max-w-3xl flex-col items-center justify-center gap-3 sm:flex-row sm:gap-5">
         <Link
-          href="/leaderboard"
-          className="rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 transition-colors hover:border-gray-300 hover:bg-gray-50"
+          href="/signup"
+          className="rounded-full border border-white/15 bg-white/[0.04] px-5 py-2 text-sm font-semibold text-white shadow-[0_0_24px_rgba(255,255,255,0.05)] transition-colors hover:border-orange-400/40 hover:bg-orange-500/10 hover:text-orange-100 sm:text-base"
         >
-          Browse products
+          Add Product
         </Link>
+        <label className="flex h-11 min-w-0 items-center gap-3 rounded-full border border-white/15 bg-white/[0.04] px-4 shadow-[0_0_24px_rgba(255,255,255,0.05)] transition-colors focus-within:border-orange-400/40">
+          <Search className="size-5 shrink-0 text-zinc-300" aria-hidden />
+          <input
+            type="search"
+            value={query}
+            onChange={(event) => onQueryChange(event.target.value)}
+            placeholder="SaaS, Vibe Coding, Content"
+            className="w-[230px] max-w-[68vw] bg-transparent text-sm font-medium text-white outline-none placeholder:text-zinc-400 sm:w-[330px] sm:text-base"
+          />
+        </label>
       </div>
     </section>
   );
 }
 
-function PlatformStrip() {
+function SectionHeader({ title }: { title: string }) {
   return (
-    <section className="border-b border-gray-100 bg-white px-6 py-4">
-      <div className="mx-auto flex max-w-4xl flex-col items-center gap-3 sm:flex-row sm:justify-center">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-gray-400">
-          Trusted integrations
-        </p>
-        <div className="flex flex-wrap items-center justify-center gap-2.5">
-          {PLATFORMS.map((platform) => (
-            <span
-              key={platform.name}
-              className="group relative inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs font-semibold text-gray-500 transition-all hover:border-violet-200 hover:bg-white hover:text-gray-800 hover:shadow-sm"
-              aria-label={platform.name}
-            >
-              <span className="flex h-5 min-w-5 items-center justify-center rounded-full border border-gray-200 bg-white px-1 text-[9px] font-bold tracking-tight text-gray-400 group-hover:border-violet-200 group-hover:text-violet-600">
-                {platform.mark}
-              </span>
-              <span className="tracking-tight">{platform.wordmark}</span>
-              <span className="pointer-events-none absolute left-1/2 top-full z-20 mt-2 -translate-x-1/2 whitespace-nowrap rounded-md border border-gray-200 bg-white px-2 py-1 text-[11px] font-medium text-gray-600 opacity-0 shadow-sm transition-opacity group-hover:opacity-100">
-                {platform.name}
-              </span>
-            </span>
+    <div className="flex items-center justify-between border-b border-white/10 px-4 py-2">
+      <h2 className="text-xl font-medium tracking-tight text-white sm:text-2xl">
+        {title}
+      </h2>
+      <Link
+        href="/leaderboard"
+        className="inline-flex items-center gap-0.5 text-[11px] font-medium text-zinc-500 hover:text-zinc-100"
+      >
+        View all
+        <ChevronRight className="size-3.5" aria-hidden />
+      </Link>
+    </div>
+  );
+}
+
+function MarketCard({
+  product,
+  index,
+}: {
+  product: LandingProduct;
+  index: number;
+}) {
+  return (
+    <article
+      className={`relative flex h-[118px] min-w-[236px] flex-col justify-between rounded-lg border border-white/12 p-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.07)] ${brandTint(
+        index,
+      )}`}
+    >
+      <span className="absolute right-0 top-0 rounded-bl-lg rounded-tr-lg bg-orange-500/15 px-2 py-1 text-[9px] font-semibold uppercase tracking-wide text-orange-300">
+        {product.revenue_verified ? "Verified" : "For Sale"}
+      </span>
+
+      <div className="flex items-start gap-3 pr-12">
+        <ProductLogo product={product} />
+        <div className="min-w-0">
+          <Link
+            href={`/p/${product.slug}`}
+            className="block truncate text-sm font-semibold text-zinc-50 drop-shadow-sm hover:text-orange-200"
+          >
+            {product.name}
+          </Link>
+          <p className="truncate text-xs font-medium text-zinc-300">
+            {product.category ?? "AI Product"}
+          </p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-3 gap-3 text-left">
+        <CardMetric label="Trust" value={product.trust_score ?? 0} />
+        <CardMetric label="Reviews" value={product.review_count ?? 0} />
+        <CardMetric label="AgentUPs" value={product.agentup_count ?? 0} />
+      </div>
+    </article>
+  );
+}
+
+function CardMetric({ label, value }: { label: string; value: number }) {
+  return (
+    <div>
+      <p className="text-[9px] font-semibold uppercase tracking-wide text-zinc-400">
+        {label}
+      </p>
+      <p className="text-sm font-semibold text-white">{value}</p>
+    </div>
+  );
+}
+
+function HorizontalProductSection({
+  title,
+  products,
+}: {
+  title: string;
+  products: LandingProduct[];
+}) {
+  return (
+    <section className="border-t border-white/10 bg-black">
+      <SectionHeader title={title} />
+      <div className="scrollbar-hide overflow-x-auto px-3 py-2.5">
+        <div className="grid auto-cols-[236px] grid-flow-col gap-3">
+          {products.slice(0, 8).map((product, index) => (
+            <MarketCard key={product.id} product={product} index={index} />
           ))}
         </div>
       </div>
@@ -187,116 +234,63 @@ function PlatformStrip() {
   );
 }
 
-function ProductLogo({ product }: { product: LandingProduct }) {
-  if (product.logo_url) {
-    return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
-        src={product.logo_url}
-        alt={product.name}
-        className="w-10 h-10 rounded-xl object-cover"
-      />
-    );
-  }
-
+function LeaderboardSection({ products }: { products: LandingProduct[] }) {
   return (
-    <div
-      className={`w-10 h-10 rounded-xl flex items-center justify-center text-white text-base font-semibold ${getLogoColor(
-        product.name,
-      )}`}
-    >
-      {product.name.charAt(0).toUpperCase() || "?"}
-    </div>
-  );
-}
-
-function ProductRow({ product }: { product: LandingProduct }) {
-  const roundedRating = Math.round(product.avg_rating ?? 0);
-
-  return (
-    <div className="flex items-center gap-4 px-6 py-4 border-b border-gray-50 hover:bg-gray-50/80 transition-colors group">
-      <ProductLogo product={product} />
-
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2">
-          <Link
-            href={`/p/${product.slug}`}
-            className="text-sm font-semibold text-gray-900 group-hover:text-violet-700 transition-colors"
-          >
-            {product.name}
-          </Link>
-          {product.revenue_verified ? (
-            <span className="text-[10px] bg-violet-50 text-violet-700 px-2 py-0.5 rounded-full border border-violet-100 font-medium">
-              Verified MRR
-            </span>
-          ) : (
-            <span className="text-[10px] bg-green-50 text-green-700 px-2 py-0.5 rounded-full border border-green-100 font-medium">
-              Free tier
-            </span>
-          )}
-        </div>
-
-        <p className="text-xs text-gray-400 mt-0.5 line-clamp-1 truncate">
-          {product.tagline ?? "No description yet"}
-        </p>
-
-        <div className="flex items-center gap-2 mt-1">
-          <span className="text-amber-400 text-xs">
-            {"★".repeat(roundedRating)}
-            {"☆".repeat(5 - roundedRating)}
-          </span>
-          <span className="text-xs text-gray-400">
-            {product.review_count ?? 0} reviews
-          </span>
-        </div>
-      </div>
-
-      <AgentUpButton
-        productId={product.id}
-        initialCount={product.agentup_count ?? 0}
-        initialUpped={false}
-      />
-    </div>
-  );
-}
-
-function Footer() {
-  return (
-    <footer className="px-6 py-12 border-t border-gray-100 bg-white text-center">
-      <p className="text-sm font-medium text-gray-500">🛡 AgentTrust</p>
-      <p className="text-xs text-gray-400 mt-1">
-        Verified trust for the AI-native era
-      </p>
-
-      <nav className="flex justify-center gap-6 mt-4">
+    <section className="border-t border-white/10 bg-black px-4 py-4">
+      <div className="mb-3 flex items-center justify-between">
+        <h2 className="text-xl font-medium tracking-tight text-white sm:text-2xl">
+          Products leaderboard
+        </h2>
         <Link
           href="/leaderboard"
-          className="text-xs text-gray-400 hover:text-gray-600"
+          className="text-[11px] font-medium text-zinc-500 hover:text-zinc-100"
         >
-          Leaderboard
+          view all &gt;
         </Link>
-        <Link
-          href="/trust-api"
-          className="text-xs text-gray-400 hover:text-gray-600"
-        >
-          Trust API
-        </Link>
-        <Link href="/pricing" className="text-xs text-gray-400 hover:text-gray-600">
-          Pricing
-        </Link>
-        <Link href="/terms" className="text-xs text-gray-400 hover:text-gray-600">
-          Terms
-        </Link>
-        <Link
-          href="/privacy"
-          className="text-xs text-gray-400 hover:text-gray-600"
-        >
-          Privacy
-        </Link>
-      </nav>
+      </div>
 
-      <p className="text-xs text-gray-300 mt-4">© 2026 AgentTrust</p>
-    </footer>
+      <div className="divide-y divide-white/10 rounded-lg border border-white/10 bg-[#101113] shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
+        {products.slice(0, 7).map((product, index) => (
+          <div
+            key={product.id}
+            className="grid grid-cols-[32px_1fr_auto] items-center gap-3 px-3 py-2.5 transition-colors hover:bg-white/[0.04]"
+          >
+            <span className="text-sm font-semibold text-zinc-500">
+              #{index + 1}
+            </span>
+            <div className="flex min-w-0 items-center gap-3">
+              <ProductLogo product={product} size="sm" />
+              <div className="min-w-0">
+                <Link
+                  href={`/p/${product.slug}`}
+                  className="block truncate text-sm font-semibold text-white hover:text-orange-200"
+                >
+                  {product.name}
+                </Link>
+                <p className="truncate text-xs text-zinc-400">
+                  {product.tagline ?? product.category ?? "Trusted AI-native product"}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="hidden text-right sm:block">
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-zinc-500">
+                  Trust
+                </p>
+                <p className="text-sm font-semibold text-white">
+                  {product.trust_score ?? 0}
+                </p>
+              </div>
+              <AgentUpButton
+                productId={product.id}
+                initialCount={product.agentup_count ?? 0}
+                initialUpped={false}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }
 
@@ -305,82 +299,54 @@ export default function LandingContent({
 }: {
   products: LandingProduct[];
 }) {
-  const [activeTab, setActiveTab] = useState<Tab>("top");
+  const [query, setQuery] = useState("");
 
-  const sortedProducts = useMemo(() => {
-    const nextProducts = [...products];
+  const filteredProducts = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase();
 
-    if (activeTab === "recent") {
-      return nextProducts.sort((a, b) => b.id.localeCompare(a.id));
+    if (!normalizedQuery) {
+      return products;
     }
 
-    if (activeTab === "most_reviewed") {
-      return nextProducts.sort(
-        (a, b) => (b.review_count ?? 0) - (a.review_count ?? 0),
-      );
-    }
-
-    return nextProducts.sort(
-      (a, b) => (b.agentup_count ?? 0) - (a.agentup_count ?? 0),
+    return products.filter((product) =>
+      [product.name, product.tagline, product.category]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase()
+        .includes(normalizedQuery),
     );
-  }, [activeTab, products]);
+  }, [products, query]);
+
+  const topProducts = useMemo(
+    () => [...filteredProducts].sort((a, b) => scoreProduct(b) - scoreProduct(a)),
+    [filteredProducts],
+  );
+  const recentProducts = useMemo(
+    () => [...filteredProducts].sort((a, b) => b.id.localeCompare(a.id)),
+    [filteredProducts],
+  );
 
   return (
-    <>
-      <Navbar />
-      <Hero />
-      <PlatformStrip />
+    <div className="min-h-screen overflow-x-hidden rounded-[32px] bg-black text-white xl:rounded-[44px]">
+      <Hero query={query} onQueryChange={setQuery} />
 
-      <div className="sticky top-[53px] z-[9] border-b border-gray-100 bg-white/95 px-4 py-3 backdrop-blur sm:px-6">
-        <div className="mx-auto flex max-w-5xl items-center gap-2 overflow-x-auto rounded-2xl border border-gray-200 bg-gray-50 p-1 shadow-sm">
-          {TABS.map((tab) => {
-            const isActive = activeTab === tab.value;
-
-            return (
-              <button
-                key={tab.value}
-                type="button"
-                onClick={() => setActiveTab(tab.value)}
-                className={`relative shrink-0 cursor-pointer rounded-xl px-4 py-2 text-sm font-semibold transition-all ${
-                  isActive
-                    ? "bg-white text-violet-700 shadow-sm ring-1 ring-violet-100"
-                    : "text-gray-500 hover:bg-white/70 hover:text-gray-800"
-                }`}
-              >
-                {tab.value === "live" ? (
-                  <span className="mr-1.5 inline-block size-1.5 rounded-full bg-emerald-500 align-middle shadow-[0_0_0_3px_rgba(16,185,129,0.12)]" />
-                ) : null}
-                {tab.label}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <section className="bg-white">
-        <div className="flex flex-col gap-2 px-6 py-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h2 className="text-sm font-semibold text-gray-800">
-              Today&apos;s top products
-            </h2>
-            <p className="mt-0.5 text-xs text-gray-400">
-              Strong reviews and AgentUPs earn products free visibility across AgentTrust.
-            </p>
-          </div>
-          <Link
-            href="/leaderboard"
-            className="text-sm font-semibold text-violet-600 transition-colors hover:text-violet-700"
-          >
-            See all -&gt;
-          </Link>
-        </div>
-
-        {sortedProducts.map((product) => (
-          <ProductRow key={product.id} product={product} />
-        ))}
-      </section>
-
-      <Footer />
-    </>
+      {filteredProducts.length === 0 ? (
+        <section className="border-t border-white/10 px-4 py-12 text-center">
+          <p className="text-2xl font-light text-white">No products found</p>
+          <p className="mt-2 text-sm text-zinc-500">
+            Try another search term or add the first product.
+          </p>
+        </section>
+      ) : (
+        <>
+          <HorizontalProductSection title="Top 5 on TrustAgent" products={topProducts} />
+          <HorizontalProductSection
+            title="Recently launched"
+            products={recentProducts}
+          />
+          <LeaderboardSection products={topProducts} />
+        </>
+      )}
+    </div>
   );
 }
